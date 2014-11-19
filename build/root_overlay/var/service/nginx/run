@@ -1,0 +1,9 @@
+#!/bin/sh
+
+#mkdir -p /var/tmp/nginx
+#chown nginx:nginx /var/tmp/nginx
+
+exec /usr/sbin/nginx
+
+sleep 10
+

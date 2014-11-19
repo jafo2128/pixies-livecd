@@ -1,0 +1,6 @@
+net-libs/courier-authlib
+virtual/mta
+app-text/openjade
+app-text/opensp
+app-text/sgml-common
+app-text/docbook-xml-dtd

@@ -1,0 +1,8 @@
+#!/bin/bash
+
+touch /var/lib/dhcp/dhcpd.leases
+mkdir -p /var/run/dhcp
+rm -f /var/run/dhcp/dhcpd.pid
+
+exec /usr/sbin/dhcpd -f eth0
+

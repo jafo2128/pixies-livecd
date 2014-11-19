@@ -1,0 +1,4 @@
+#!/bin/bash
+
+exec /usr/sbin/in.tftpd --foreground -4 --port-range 4096:32767 --secure /mnt/cdrom
+

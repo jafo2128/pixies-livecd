@@ -1,0 +1,91 @@
+#!/bin/bash
+
+trap - INT QUIT TSTP
+export PATH=/sbin:/bin:/usr/sbin:/usr/bin
+
+. /etc/init/functs.sh
+
+rc_sysinit() {
+
+	ebegin 'populate /dev'
+	#[ -e /mnt/cdrom/zisofs/dev.tar ] && tar -xpf /mnt/cdrom/zisofs/dev.tar -C /dev/
+	#[ -e /mnt/livecd/dev.tar ] && tar -xpf /mnt/livecd/dev.tar -C /dev/
+	#/sbin/udevd /dev
+
+	ebegin 'mount filesystems'
+	#mount -t proc -o nosuid,noexec proc /proc
+	#mount -a
+	mount -o remount,rw /
+
+}
+
+rc_start_network() {
+
+	ebegin 'setup networking'
+	hostname livecd
+	ip addr add 127.0.0.1/8 brd 127.255.255.255 dev lo
+	ip link set lo up
+
+	#ip addr add 10.214.0.1/24 dev eth0
+	#ip link set eth0 up
+
+	#/sbin/dhcpcd -h peter eth0
+
+}
+
+
+rc_network() {
+
+	rc_start_network
+
+	ebegin 'start services'
+	sysctl -q -w net.ipv4.ip_forward=0
+	sysctl -q -w kernel.panic=3
+	sysctl -q -w kernel.panic_on_oops=1
+	#syslog-ng
+	cat /var/run/random-seed > /dev/urandom 2>/dev/null
+	#/usr/sbin/sshd
+	cp -r /mnt/livecd/service /
+	#svscanboot &
+}
+
+rc_nonetwork() {
+	:
+	#ebegin 'start system logger'
+	#syslog-ng
+}
+
+rc_shutdown() {
+	#ebegin 'send sigterm and sigkill'
+	#/sbin/killall5 -15
+	#sleep 2
+	#/sbin/killall5 -9
+	ebegin 'unmount filesystems'
+	/bin/mount -a -o remount,ro
+	#/bin/umount -a &>/dev/null
+}
+
+case "$1" in 
+	sysinit )
+		rc_sysinit
+		;;
+	nonetwork )
+		rc_nonetwork
+		;;
+	network )
+		rc_network
+		;;
+	start_network )
+		rc_start_network
+		;;
+	reboot )
+		rc_shutdown
+		/sbin/reboot -f
+		;;
+	shutdown )
+		rc_shutdown
+		/sbin/halt -p
+		;;
+esac
+
+

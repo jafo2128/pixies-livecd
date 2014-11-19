@@ -1,0 +1,10 @@
+#!/bin/bash
+
+exec 2>&1
+
+sleep 2
+
+#exec /sbin/rpc.statd --foreground --no-syslog --no-notify --name 10.212.0.3 --port 4003 --outgoing-port 4004
+exec /sbin/rpc.statd --foreground --no-syslog --no-notify --port 4003 --outgoing-port 4004
+
+

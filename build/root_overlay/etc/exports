@@ -1,0 +1,4 @@
+# /etc/exports: NFS file systems being exported.  See exports(5).
+
+/mnt 0.0.0.0/0.0.0.0(ro,no_subtree_check,all_squash,insecure,anonuid=65534,anongid=65534,fsid=1)
+

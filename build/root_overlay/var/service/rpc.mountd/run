@@ -1,0 +1,11 @@
+#!/bin/bash
+
+exec 2>&1
+
+sleep 4
+
+/usr/sbin/rpc.nfsd 2
+sleep 2
+exec /usr/sbin/rpc.mountd --foreground --nfs-version 3 --port 4002
+
+

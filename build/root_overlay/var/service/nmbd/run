@@ -1,0 +1,6 @@
+#!/bin/sh
+
+mkdir -p /var/run/samba/
+
+exec /usr/sbin/nmbd -F -S
+
