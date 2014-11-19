@@ -1,0 +1,13 @@
+
+catalyst build environment that creates two different flavor of linux livecds:
+
+ - one that can act as a PXE server when more servers need to be installed in the same subnet
+ - a stripped-down version for one-off server installs
+
+dependencies:
+ a PATCHED version of catalyst [1], a lot of patience and a few buckets worth of cpu cycles.
+
+
+[1] https://www.gentoo.org/proj/en/releng/catalyst/
+
+

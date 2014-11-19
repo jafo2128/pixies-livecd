@@ -1,0 +1,170 @@
+diff -upr orig/usr/lib64/catalyst/modules/generic_stage_target.py new/usr/lib64/catalyst/modules/generic_stage_target.py
+--- orig/usr/lib64/catalyst/modules/generic_stage_target.py	2014-10-25 12:18:28.000000000 +0300
++++ new/usr/lib64/catalyst/modules/generic_stage_target.py	2014-11-19 14:06:03.000000000 +0200
+@@ -146,6 +146,7 @@ class generic_stage_target(generic_targe
+ 		self.set_iso_volume_id()
+ 		self.set_build_kernel_vars()
+ 		self.set_fsscript()
++		self.set_integritycheck()
+ 		self.set_install_mask()
+ 		self.set_rcadd()
+ 		self.set_rcdel()
+@@ -326,6 +327,12 @@ class generic_stage_target(generic_targe
+ 				self.settings[self.settings["spec_prefix"]+"/fsscript"]
+ 			del self.settings[self.settings["spec_prefix"]+"/fsscript"]
+ 
++	def set_integritycheck(self):
++		if self.settings["spec_prefix"]+"/integritycheck" in self.settings:
++			self.settings["integritycheck"]=\
++				self.settings[self.settings["spec_prefix"]+"/integritycheck"]
++			del self.settings[self.settings["spec_prefix"]+"/integritycheck"]
++
+ 	def set_rcadd(self):
+ 		if self.settings["spec_prefix"]+"/rcadd" in self.settings:
+ 			self.settings["rcadd"]=\
+@@ -1028,63 +1035,6 @@ class generic_stage_target(generic_targe
+ 				cmd("cp /etc/hosts "+self.settings["chroot_path"]+"/etc/hosts",\
+ 					"Could not copy /etc/hosts",env=self.env)
+ 
+-			""" Modify and write out make.conf (for the chroot) """
+-			cmd("rm -f "+self.settings["chroot_path"]+"/etc/portage/make.conf",\
+-				"Could not remove "+self.settings["chroot_path"]+\
+-				"/etc/portage/make.conf",env=self.env)
+-			myf=open(self.settings["chroot_path"]+"/etc/portage/make.conf","w")
+-			myf.write("# These settings were set by the catalyst build script that automatically\n# built this stage.\n")
+-			myf.write("# Please consult /usr/share/portage/config/make.conf.example for a more\n# detailed example.\n")
+-			if "CFLAGS" in self.settings:
+-				myf.write('CFLAGS="'+self.settings["CFLAGS"]+'"\n')
+-			if "CXXFLAGS" in self.settings:
+-				if self.settings["CXXFLAGS"]!=self.settings["CFLAGS"]:
+-					myf.write('CXXFLAGS="'+self.settings["CXXFLAGS"]+'"\n')
+-				else:
+-					myf.write('CXXFLAGS="${CFLAGS}"\n')
+-			else:
+-				myf.write('CXXFLAGS="${CFLAGS}"\n')
+-
+-			if "LDFLAGS" in self.settings:
+-				myf.write("# LDFLAGS is unsupported.  USE AT YOUR OWN RISK!\n")
+-				myf.write('LDFLAGS="'+self.settings["LDFLAGS"]+'"\n')
+-			if "CBUILD" in self.settings:
+-				myf.write("# This should not be changed unless you know exactly what you are doing.  You\n# should probably be using a different stage, instead.\n")
+-				myf.write('CBUILD="'+self.settings["CBUILD"]+'"\n')
+-
+-			myf.write("# WARNING: Changing your CHOST is not something that should be done lightly.\n# Please consult http://www.gentoo.org/doc/en/change-chost.xml before changing.\n")
+-			myf.write('CHOST="'+self.settings["CHOST"]+'"\n')
+-
+-			""" Figure out what our USE vars are for building """
+-			myusevars=[]
+-			if "HOSTUSE" in self.settings:
+-				myusevars.extend(self.settings["HOSTUSE"])
+-
+-			if "use" in self.settings:
+-				myusevars.extend(self.settings["use"])
+-
+-			if myusevars:
+-				myf.write("# These are the USE flags that were used in addition to what is provided by the\n# profile used for building.\n")
+-				myusevars = sorted(set(myusevars))
+-				myf.write('USE="'+string.join(myusevars)+'"\n')
+-				if '-*' in myusevars:
+-					print "\nWarning!!!  "
+-					print "\tThe use of -* in "+self.settings["spec_prefix"]+\
+-						"/use will cause portage to ignore"
+-					print "\tpackage.use in the profile and portage_confdir. You've been warned!"
+-
+-			myf.write('PORTDIR="/usr/portage"\n')
+-			myf.write('DISTDIR="${PORTDIR}/distfiles"\n')
+-			myf.write('PKGDIR="${PORTDIR}/packages"\n')
+-
+-			""" Setup the portage overlay """
+-			if "portage_overlay" in self.settings:
+-				myf.write('PORTDIR_OVERLAY="/usr/local/portage"\n')
+-
+-			myf.close()
+-			cmd("cp "+self.settings["chroot_path"]+"/etc/portage/make.conf "+\
+-				self.settings["chroot_path"]+"/etc/portage/make.conf.catalyst",\
+-				"Could not backup /etc/portage/make.conf",env=self.env)
+ 			touch(self.settings["autoresume_path"]+"chroot_setup")
+ 
+ 	def fsscript(self):
+@@ -1098,6 +1048,17 @@ class generic_stage_target(generic_targe
+ 						" fsscript","fsscript script failed.",env=self.env)
+ 					touch(self.settings["autoresume_path"]+"fsscript")
+ 
++	def integritycheck(self):
++		if "AUTORESUME" in self.settings \
++			and os.path.exists(self.settings["autoresume_path"]+"integritycheck"):
++			print "Resume point detected, skipping integritycheck operation..."
++		else:
++			if "integritycheck" in self.settings:
++				if os.path.exists(self.settings["controller_file"]):
++					cmd("/bin/bash "+self.settings["controller_file"]+\
++						" integritycheck","integritycheck script failed.",env=self.env)
++					touch(self.settings["autoresume_path"]+"integritycheck")
++
+ 	def rcupdate(self):
+ 		if "AUTORESUME" in self.settings \
+ 			and os.path.exists(self.settings["autoresume_path"]+"rcupdate"):
+diff -upr orig/usr/lib64/catalyst/modules/livecd_stage2_target.py new/usr/lib64/catalyst/modules/livecd_stage2_target.py
+--- orig/usr/lib64/catalyst/modules/livecd_stage2_target.py	2014-10-25 12:18:27.000000000 +0300
++++ new/usr/lib64/catalyst/modules/livecd_stage2_target.py	2014-11-19 14:07:17.000000000 +0200
+@@ -21,7 +21,7 @@ class livecd_stage2_target(generic_stage
+ 			"livecd/unmerge","livecd/iso","livecd/gk_mainargs","livecd/type",\
+ 			"livecd/readme","livecd/motd","livecd/overlay",\
+ 			"livecd/modblacklist","livecd/splash_theme","livecd/rcadd",\
+-			"livecd/rcdel","livecd/fsscript","livecd/xinitrc",\
++			"livecd/rcdel","livecd/fsscript","livecd/integritycheck","livecd/xinitrc",\
+ 			"livecd/root_overlay","livecd/users","portage_overlay",\
+ 			"livecd/fstype","livecd/fsops","livecd/linuxrc","livecd/bootargs",\
+ 			"gamecd/conf","livecd/xdm","livecd/xsession","livecd/volid"])
+@@ -137,7 +137,7 @@ class livecd_stage2_target(generic_stage
+ 		if "FETCH" not in self.settings:
+ 			self.settings["action_sequence"] += ["bootloader","preclean",\
+ 				"livecd_update","root_overlay","fsscript","rcupdate","unmerge",\
+-				"unbind","remove","empty","target_setup",\
++				"unbind","remove","empty","integritycheck","target_setup",\
+ 				"setup_overlay","create_iso"]
+ 		self.settings["action_sequence"].append("clear_autoresume")
+ 
+diff -upr orig/usr/lib64/catalyst/targets/livecd-stage2/livecd-stage2-controller.sh new/usr/lib64/catalyst/targets/livecd-stage2/livecd-stage2-controller.sh
+--- orig/usr/lib64/catalyst/targets/livecd-stage2/livecd-stage2-controller.sh	2014-10-25 12:18:33.000000000 +0300
++++ new/usr/lib64/catalyst/targets/livecd-stage2/livecd-stage2-controller.sh	2014-11-19 14:08:13.000000000 +0200
+@@ -191,6 +191,11 @@ case $1 in
+         exec_in_chroot ${clst_sharedir}/targets/support/unmerge.sh
+     ;;
+ 
++	integritycheck)
++		shift
++		exec_in_chroot ${clst_integritycheck}
++		;;
++
+ 	target_image_setup)
+ 		shift
+ 		${clst_sharedir}/targets/support/target_image_setup.sh $1
+diff -upr orig/usr/lib64/catalyst/targets/support/functions.sh new/usr/lib64/catalyst/targets/support/functions.sh
+--- orig/usr/lib64/catalyst/targets/support/functions.sh	2014-10-25 12:18:37.000000000 +0300
++++ new/usr/lib64/catalyst/targets/support/functions.sh	2014-11-15 11:58:45.000000000 +0200
+@@ -90,13 +90,13 @@ extract_kernels() {
+ 		# change kernel name from "kernel" to "gentoo", for example
+ 		if [ -e ${1}/kernel-* ]
+ 		then
+-			mv ${1}/kernel-* ${1}/${x}
++			rm ${1}/kernel-*
+ 		fi
+ 
+ 		# change kernel name from "kernelz" to "gentoo", for example
+ 		if [ -e ${1}/kernelz-* ]
+ 		then
+-			mv ${1}/kernelz-* ${1}/${x}
++			rm ${1}/kernelz-*
+ 		fi
+ 
+ 		# change initrd name from "initrd" to "gentoo.igz", for example
+@@ -112,7 +112,7 @@ extract_kernels() {
+ 
+ 		if [ -e ${1}/System.map-* ]
+ 		then
+-			mv ${1}/System.map-* ${1}/System-${x}.map
++			rm ${1}/System.map-*
+ 		fi
+ 	done
+ }
