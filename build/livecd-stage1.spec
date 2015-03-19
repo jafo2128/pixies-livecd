@@ -11,7 +11,7 @@ subarch: amd64
 # The version stamp is an identifier for the build.  It can be anything you wish# it to be, but it is usually a date.
 # example:
 # version_stamp: 2006.1
-version_stamp: hardened-2014.10
+version_stamp: hardened-2015.02
 
 # The target specifies what target we want catalyst to do.  For building a CD,
 # we start with livecd-stage1 as our target.
@@ -34,13 +34,13 @@ profile: hardened/linux/amd64/no-multilib
 # This specifies which snapshot to use for building this target.
 # example:
 # snapshot: 2006.1
-snapshot: 20141106
+snapshot: 20150204
 
 # This specifies where the seed stage comes from for this target,  The path is
 # relative to $clst_sharedir/builds.  The rel_type is also used as a path prefix# for the seed.
 # example:
 # default/stage3-x86-2006.1
-source_subpath: stage3-amd64-hardened+nomultilib-20141023
+source_subpath: stage3-amd64-hardened+nomultilib-20150108
 
 # These are the hosts used as distcc slaves when distcc is enabled in your
 # catalyst.conf.  It follows the same syntax as distcc-config --set-hosts and
@@ -68,7 +68,7 @@ portage_overlay: /local/portage/overlay
 # by catalyst based on the spec file.
 # example:
 # pkgcache_path: /tmp/packages
-pkgcache_path: /local/catalyst/packages/hardened-2014.10
+pkgcache_path: /local/catalyst/packages/hardened-2015.02
 
 # The livecd-stage1 target is where you will build packages for your CD.  These
 # packages can be built with customized USE settings.  The settings here are
@@ -186,4 +186,8 @@ livecd/packages:
 	www-servers/nginx
 	sys-process/daemontools-scripts
 	sys-process/daemontools
+	net-misc/ntp
+	sys-apps/hwids
+	sys-devel/bc
+
 

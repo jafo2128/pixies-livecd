@@ -1,5 +1,5 @@
 
-SNAPSHOT="hardened-2014.10"
+SNAPSHOT="hardened-2015.02"
 
 PACKAGES_DIR="/local/catalyst/packages/${SNAPSHOT}"
 

@@ -11,7 +11,7 @@ subarch: amd64
 # The version stamp is an identifier for the build.  It can be anything you wish# it to be, but it is usually a date.
 # example:
 # version_stamp: 2006.1
-version_stamp: hardened-2014.10
+version_stamp: hardened-2015.02
 
 # The target specifies what target we want catalyst to do.  For building a CD,
 # we continue with livecd-stage2 as the target.
@@ -34,13 +34,13 @@ profile: hardened/linux/amd64/no-multilib
 # This specifies which snapshot to use for building this target.
 # example:
 # snapshot: 2006.1
-snapshot: 20141106
+snapshot: 20150204
 
 # This specifies where the seed stage comes from for this target,  The path is
 # relative to $clst_sharedir/builds.  The rel_type is also used as a path prefix# for the seed.
 # example:
 # default/livecd-stage1-x86-2006.1
-source_subpath: default/livecd-stage1-amd64-hardened-2014.10
+source_subpath: default/livecd-stage1-amd64-hardened-2015.02
 
 # These are the hosts used as distcc slaves when distcc is enabled in your
 # catalyst.conf.  It follows the same syntax as distcc-config --set-hosts and
@@ -68,7 +68,7 @@ portage_overlay: /local/portage/overlay
 # by catalyst based on the spec file.
 # example:
 # pkgcache_path: /tmp/packages
-pkgcache_path: /local/catalyst/packages/hardened-2014.10
+pkgcache_path: /local/catalyst/packages/hardened-2015.02
 
 # This allows the optional directory containing the output packages for kernel
 # builds.  Mainly used as a way for different spec files to access the same
@@ -107,7 +107,7 @@ livecd/cdtar:
 # target will create.
 # example:
 # livecd/iso: /tmp/installcd-x86-minimal.iso
-livecd/iso: /local/livecd/livecd-minimal-2014.10-amd64.iso
+livecd/iso: /local/livecd/livecd-minimal-2015.02-amd64.iso
 
 # A fsscript is simply a shell script that is copied into the chroot of the CD
 # after the kernel(s) and any external modules have been compiled and is
@@ -257,7 +257,7 @@ livecd/users:
 # This option sets the volume ID of the CD created.
 # example:
 # livecd/volid: Gentoo Linux 2006.1 X86
-livecd/volid: Peter's LiveCD 2014.10 amd64
+livecd/volid: Peter's LiveCD 2015.02 amd64
 
 # This option is only used when creating a GameCD.  This specifies the file that
 # contains the definitions for GAME_NAME and GAME_EXECUTABLE, which are used by
@@ -283,7 +283,7 @@ boot/kernel/gentoo/sources: grsec-sources
 # used by genkernel to compile the kernel this label applies to.
 # example:
 # boot/kernel/gentoo/config: /tmp/2.6.11-smp.config
-boot/kernel/gentoo/config: 3.2.63-grsec-s003.config
+boot/kernel/gentoo/config: 3.14.27-s003.config
 
 # This option sets genkernel parameters on a per-kernel basis and applies only
 # to this kernel label.  This can be used for building options into only a
@@ -397,14 +397,18 @@ livecd/unmerge:
 	net-misc/knock
 	net-misc/nemesis
 	net-nds/rpcbind
-	sys-apps/groff
 	sys-apps/kbd
-	sys-apps/man-db
-	sys-apps/man-pages
 	sys-apps/man-pages-posix
 	sys-process/daemontools
 	sys-process/daemontools-scripts
 	www-servers/nginx
+	sys-apps/sg3_utils
+	sys-apps/hwsetup
+	sys-apps/hwdata-gentoo
+	sys-apps/lshw
+	#sys-apps/man-db
+	#sys-apps/man-pages
+	#sys-apps/groff
 
 # This option is used to empty the directories listed.  It is useful for getting
 # rid of files that don't belong to a particular package, or removing files from
@@ -424,7 +428,6 @@ livecd/empty:
     /usr/share/zoneinfo
     /usr/share/dict
     /usr/share/doc
-	/usr/share/man
     /usr/share/ss
     /usr/lib/python2.4
     /usr/share/i18n
@@ -432,49 +435,77 @@ livecd/empty:
     /usr/share/doc
     /root/.ccache
     /var/db
+	/usr/share/man/??
+	/usr/share/man/??\.*
+	/usr/share/man/??_*
+	#/usr/share/man
 
 # This option tells catalyst to clean specific files from the filesystem and is
 # very usefu in cleaning up stray files in /etc left over after livecd/unmerge.
 # example:
 # livecd/rm: /lib/*.a /usr/lib/*.a /usr/lib/gcc-lib/*/*/libgcj* /etc/dispatch-conf.conf /etc/etc-update.conf /etc/*- /etc/issue* /etc/portage/make.conf /etc/man.conf /etc/*.old /root/.viminfo /usr/sbin/bootsplash* /usr/sbin/fb* /usr/sbin/fsck.cramfs /usr/sbin/fsck.minix /usr/sbin/mkfs.minix /usr/sbin/mkfs.bfs /usr/sbin/mkfs.cramfs /lib/security/pam_access.so /lib/security/pam_chroot.so /lib/security/pam_debug.so /lib/security/pam_ftp.so /lib/security/pam_issue.so /lib/security/pam_mail.so /lib/security/pam_motd.so /lib/security/pam_mkhomedir.so /lib/security/pam_postgresok.so /lib/security/pam_rhosts_auth.so /lib/security/pam_userdb.so /usr/share/consolefonts/1* /usr/share/consolefonts/7* /usr/share/consolefonts/8* /usr/share/consolefonts/9* /usr/share/consolefonts/A* /usr/share/consolefonts/C* /usr/share/consolefonts/E* /usr/share/consolefonts/G* /usr/share/consolefonts/L* /usr/share/consolefonts/M* /usr/share/consolefonts/R* /usr/share/consolefonts/a* /usr/share/consolefonts/c* /usr/share/consolefonts/dr* /usr/share/consolefonts/g* /usr/share/consolefonts/i* /usr/share/consolefonts/k* /usr/share/consolefonts/l* /usr/share/consolefonts/r* /usr/share/consolefonts/s* /usr/share/consolefonts/t* /usr/share/consolefonts/v* /etc/splash/livecd-2006.1/16* /etc/splash/livecd-2006.1/12* /etc/splash/livecd-2006.1/6* /etc/splash/livecd-2006.1/8* /etc/splash/livecd-2006.1/images/silent-16* /etc/splash/livecd-2006.1/images/silent-12* /etc/splash/livecd-2006.1/images/silent-6* /etc/splash/livecd-2006.1/images/silent-8* /etc/splash/livecd-2006.1/images/verbose-16* /etc/splash/livecd-2006.1/images/verbose-12* /etc/splash/livecd-2006.1/images/verbose-6* /etc/splash/livecd-2006.1/images/verbose-8* /etc/portage/make.conf.example /etc/make.globals /etc/resolv.conf
 livecd/rm:
-    /boot
-    /etc/cron*
-    /etc/eselect
-    /lib/*.a
+	/boot
+	/etc/cron*
+	/etc/eselect
+	/lib/*.a
 	/lib/modules
 	/lib/udev
-    /usr/bin/i386-pc*
-    /usr/bin/yacc
-    /sbin/rescan-scsi-bus
-    /usr/*-pc-linux-gnu
+	/usr/bin/i386-pc*
+	/usr/bin/yacc
+	/sbin/rescan-scsi-bus
+	/usr/*-pc-linux-gnu
 	/usr/include
 	/usr/portage
-    /usr/bin/c++*
+	/usr/bin/c++*
 	/usr/share/aclocal
 	/usr/share/applications
+	/usr/share/bash-completion
+	/usr/share/gdb
 	/usr/share/gtk-doc
 	/usr/share/locale
+	/usr/share/pixmaps
+	/usr/share/pkgconfig
+	/usr/share/portage
 	/usr/share/sgml
 	/usr/share/info
 	/usr/share/build*
+	/usr/share/misc/pci.ids
+	/usr/share/misc/usb.ids
 	/local
 	/usr/local
 	/usr/lib/gconv
-    /usr/lib/portage
+	/usr/lib/portage
 	/usr/lib/systemd
 	/usr/lib64/python*
 	/usr/lib64/libpython*
+	/usr/lib64/perl5
+	/usr/lib64/pkgconfig
 	/usr/bin/idle*
 	/usr/bin/pydoc*
 	/usr/bin/2to3*
 	/usr/bin/python*
+	/usr/bin/x86_64*
 	/etc/conf.d
 	/etc/init.d
 	/etc/env.d
 	/etc/runlevels
 	/etc/sgml
+	/etc/systemd
 	/etc/udev
 	/etc/xinetd.d
 	/media
+	/var/lib/gentoo/news
 	/var/lock
+	/run/openrc
+	/usr/sbin/ntpd
+	/usr/bin/calc_tickadj
+	/usr/bin/ntp-keygen
+	/usr/bin/ntp-wait
+	/usr/bin/ntpdc
+	/usr/bin/ntpq
+	/usr/bin/ntptime
+	/usr/bin/ntptrace
+	/usr/bin/sntp
+	/usr/bin/tickadj
+	/var/log/*

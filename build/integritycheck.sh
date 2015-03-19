@@ -17,4 +17,5 @@ for i in /bin/* /sbin/* /usr/bin/* /usr/sbin/*; do
                 ldd $i
 done
 
+exit 0
 

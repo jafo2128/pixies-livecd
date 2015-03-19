@@ -11,7 +11,7 @@ subarch: amd64
 # The version stamp is an identifier for the build.  It can be anything you wish# it to be, but it is usually a date.
 # example:
 # version_stamp: 2006.1
-version_stamp: hardened-2014.10
+version_stamp: hardened-2015.02
 
 # The target specifies what target we want catalyst to do.  For building a CD,
 # we continue with livecd-stage2 as the target.
@@ -34,13 +34,13 @@ profile: hardened/linux/amd64/no-multilib
 # This specifies which snapshot to use for building this target.
 # example:
 # snapshot: 2006.1
-snapshot: 20141106
+snapshot: 20150204
 
 # This specifies where the seed stage comes from for this target,  The path is
 # relative to $clst_sharedir/builds.  The rel_type is also used as a path prefix# for the seed.
 # example:
 # default/livecd-stage1-x86-2006.1
-source_subpath: default/livecd-stage1-amd64-hardened-2014.10
+source_subpath: default/livecd-stage1-amd64-hardened-2015.02
 
 # These are the hosts used as distcc slaves when distcc is enabled in your
 # catalyst.conf.  It follows the same syntax as distcc-config --set-hosts and
@@ -68,7 +68,7 @@ portage_overlay: /local/portage/overlay
 # by catalyst based on the spec file.
 # example:
 # pkgcache_path: /tmp/packages
-pkgcache_path: /local/catalyst/packages/hardened-2014.10
+pkgcache_path: /local/catalyst/packages/hardened-2015.02
 
 # This allows the optional directory containing the output packages for kernel
 # builds.  Mainly used as a way for different spec files to access the same
@@ -107,7 +107,7 @@ livecd/cdtar:
 # target will create.
 # example:
 # livecd/iso: /tmp/installcd-x86-minimal.iso
-livecd/iso: /local/livecd/livecd-2014.10-amd64.iso
+livecd/iso: /local/livecd/livecd-pxe-2015.02-amd64.iso
 
 # A fsscript is simply a shell script that is copied into the chroot of the CD
 # after the kernel(s) and any external modules have been compiled and is
@@ -120,6 +120,8 @@ livecd/iso: /local/livecd/livecd-2014.10-amd64.iso
 # example:
 # livecd/fsscript:
 livecd/fsscript: /local/catalyst/build/fsscript.sh
+
+livecd/integritycheck: /local/catalyst/build/integritycheck.sh
 
 # This is where you set the splash theme.  This theme must be present in
 # /etc/splash, before the kernel has completed building.
@@ -255,7 +257,7 @@ livecd/users:
 # This option sets the volume ID of the CD created.
 # example:
 # livecd/volid: Gentoo Linux 2006.1 X86
-livecd/volid: Peter's LiveCD 2014.10 amd64
+livecd/volid: Peter's LiveCD 2015.02 amd64
 
 # This option is only used when creating a GameCD.  This specifies the file that
 # contains the definitions for GAME_NAME and GAME_EXECUTABLE, which are used by
@@ -281,7 +283,7 @@ boot/kernel/gentoo/sources: grsec-sources
 # used by genkernel to compile the kernel this label applies to.
 # example:
 # boot/kernel/gentoo/config: /tmp/2.6.11-smp.config
-boot/kernel/gentoo/config: 3.2.63-grsec-s003.config
+boot/kernel/gentoo/config: 3.14.27-s003.config
 
 # This option sets genkernel parameters on a per-kernel basis and applies only
 # to this kernel label.  This can be used for building options into only a
@@ -434,6 +436,8 @@ livecd/rm:
 	/usr/share/gtk-doc
 	/usr/share/locale
 	/usr/share/sgml
+	/usr/share/misc/pci.ids
+	/usr/share/misc/usb.ids
 	/local
 	/usr/local
 	/usr/lib64/python*
